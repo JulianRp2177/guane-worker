@@ -1,18 +1,88 @@
-# Charlie Mail Worker 
+# Worker app
+This service will execute the functionalities that were stipulated for the relationship with the middleware of the service in order to respond to the requests of the app-fitness.
 
-This is a service that uses Celery and rabbitMQ to create tasks where email ingestion is performed by making a request to the GraphO365 service.
+implementing a worker Celery technology, and a service queue with Rabbit Mq in order to optimize the sending of tasks to be solved.
 
-## How To Run
-### Develop
-1. Run an instance of rabbit (broker) and redis (backend) locally via containers. This is done through docker compose located in the `docker/Docker-compose.dev.yaml` folder.
-To do this run the following command
+this service is connected by Docker containers from its Docker image. 
+
+## Installation of dependencies
+
+commands
 
 ```bash
-`docker-compose -f docker/Docker-compose.dev.yaml up -d`
+
+pipenv shell
+pipenv install
+
 ```
 
+## Usage to run Rabbit Mq
+command
 
-2. Then, you need to start the celery worker. For this in the root folder of the project there is an example `launch.json` to put in the `.vscode` folder, used for debugging.
-As the worker runs locally (not in a container) be sure that it is running in a virtual environment with all the required dependencies in the project.
+```bash
+docker-compose -f docker/Docker-compose.dev.yml up --build
 
-3. The last step is to send a task to the worker, to do this you have a `main.py` file in the root of the project, there you must send the required data. And execute with `python main.py`.
+```
+## Usage to run Worker
+
+Next, it is necessary to start the celery worker.
+As the worker runs locally (not in a container) make sure it runs in a virtual environment with all the necessary dependencies in the project.
+
+this for the launch.json file in the root .vscode folder
+
+```python
+{
+  "version": "0.2.0",
+  "configurations": [
+  
+    {
+      "name": "worker",
+      "type": "python",
+      "request": "launch",
+      "module": "celery",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "args": [
+        "-A",
+        "app.worker.reservation",
+        "worker",
+        "-l",
+        "info",
+        "-c",
+        "1",
+        "-Q",
+        "reservation"
+      ],
+      "env": {
+        "APP_TITLE": "Guane Worker",
+        "APP_DESCRIPTION":"Worker API",
+        "APP_VERSION":"1.0.0",
+        "RABBITMQ_USER": "user",
+        "RABBITMQ_PASSWORD": "bitnami",
+        "RABBITMQ_HOST": "localhost",
+        "RABBITMQ_PORT": "5673",
+        "DB_API": "http://localhost:8001",
+        "DEBUGGER": "False",
+        "ENVIRONMENT": "str",
+        "WORKER_ROUTER": "app.worker.reservation.init_reservation",
+        "QUEUE_INTAKE": "reservation"
+      }
+    }
+  ]
+}
+
+
+```
+
+## Important
+
+Please make sure to update tests as appropriate.
+if the command to run the program has an error add to the beginning of this default SUDO
+
+## Remember
+
+service-db and middelware services must be running to run and test this one
+
+## License
+[MIT](https://choosealicense.com/licenses/mit/)
+
