@@ -1,0 +1,52 @@
+version: "3.7"
+
+services:
+  rabbitmq:
+    image: bitnami/rabbitmq:latest
+    environment:
+      - RABBITMQ_DISK_FREE_ABSOLUTE_LIMIT=1000000000
+    ports:
+      - 4368:4369
+      - 5673:5672
+      - 25673:25672
+      - 15673:15672
+    expose:
+      - 4368
+      - 5673
+      - 25673
+      - 15673
+    networks:
+      - guane
+
+  celery-service:
+    image: service-worker:1.0.0
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    command: uvicorn app.main:app --reload --workers 1 --host 0.0.0.0 --port 80
+    ports: 
+      - 9040:80
+      - 10101:10101
+    expose:
+      - 9040
+    volumes:
+      - ../:/usr/src/app/
+    environment:
+        - APP_TITLE=Worker Guane
+        - APP_DESCRIPTION=Worker API service
+        - APP_VERSION=1.0.0
+        - RABBITMQ_USER=user
+        - RABBITMQ_PASSWORD=bitnami
+        - RABBITMQ_HOST=rabbitmq
+        - RABBITMQ_PORT=5672
+        - DB_API=http://service-db-postgres
+        - DEBUGGER=False
+        - ENVIRONMENT=dev
+        - WORKER_ROUTER=app.worker.reservation.init_reservation
+        - QUEUE_INTAKE=reservation
+    networks:
+      - guane
+
+networks:
+  guane:
+    external: true

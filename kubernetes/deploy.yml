@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: charlie-addons-worker-api-deploy
+  namespace: charlie-addons-prod
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: charlie-addons-worker-api
+  template:
+    metadata:
+      labels:
+        app: charlie-addons-worker-api
+        scope: charlie-addons
+        tier: backend
+    spec:
+      containers:
+        - name: charlie-addons-worker-api
+          image: gcr.io/charliebertvg/charlie-addons-worker-api:1.0.0
+          command:
+            - "gunicorn"
+          args:
+          [
+            "app.main:app",
+            "-w",
+            "1",
+            "-k",
+            "uvicorn.workers.UvicornWorker",
+            "-b",
+            "0.0.0.0:80",
+            "--access-logfile",
+            "-",
+            "--log-level",
+            "info",
+            "--timeout",
+            "3600",
+          ]
+          resources:
+            requests:
+              memory: "100Mi"
+              cpu: "100m"
+            limits:
+              memory: "900Mi"
+              cpu: "900m"
+          ports:
+            - containerPort: 80
+          envFrom:
+            - configMapRef:
+                name: charlie-addons-worker-config

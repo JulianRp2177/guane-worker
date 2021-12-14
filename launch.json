@@ -1,0 +1,55 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python: Current File",
+      "type": "python",
+      "request": "launch",
+      "program": "main.py",
+      "console": "integratedTerminal",
+      "env": {
+        "RABBITMQ_USER": "user",
+        "RABBITMQ_PASSWORD": "bitnami",
+        "RABBITMQ_HOST": "localhost",
+        "RABBITMQ_PORT": "5672",
+        "MAGAYA_MIRIAM_DB": "http://localhost:5000",
+        "VOCAB_API": "http://localhost:8002",
+        "BUCKET_CONNECTION": "DefaultEndpointsProtocol=https;AccountName=miriam2021;AccountKey=W+Lem7Ki1yQkVrn1GQCMQXbBUxeXWkErvxmKiy67MHQtq8207KN+FXEhr4fmOxO1TWwEkXXpSHmV/Vmj394NlQ==;EndpointSuffix=core.windows.net",
+        "BUCKET_NAME": "contract-test",
+        "MIN_WORDS": "1",
+        "PARAGRAPHS_MAX_LEN": "10000"
+      }
+    },
+    {
+      "name": "worker-charlie-mail",
+      "type": "python",
+      "request": "launch",
+      "module": "celery",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "args": [
+        "-A",
+        "app.worker.intake",
+        "worker",
+        "-l",
+        "info",
+        "-c",
+        "1",
+        "-Q",
+        "intake"
+      ],
+      "env": {
+        "RABBITMQ_USER": "user",
+        "RABBITMQ_PASSWORD": "bitnami",
+        "RABBITMQ_HOST": "localhost",
+        "RABBITMQ_PORT": "5672",
+        "MAGAYA_MIRIAM_DB": "http://localhost:5000",
+        "VOCAB_API": "http://localhost:8002",
+        "BUCKET_CONNECTION": "DefaultEndpointsProtocol=https;AccountName=miriam2021;AccountKey=W+Lem7Ki1yQkVrn1GQCMQXbBUxeXWkErvxmKiy67MHQtq8207KN+FXEhr4fmOxO1TWwEkXXpSHmV/Vmj394NlQ==;EndpointSuffix=core.windows.net",
+        "BUCKET_NAME": "contract-test",
+        "MIN_WORDS": "1",
+        "PARAGRAPHS_MAX_LEN": "10000"
+      }
+    }
+  ]
+}

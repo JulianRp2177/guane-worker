@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: charlie-addons-worker-deploy
+  namespace: charlie-addons-prod
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: charlie-addons-worker
+  template:
+    metadata:
+      labels:
+        app: charlie-addons-worker
+        scope: charlie-addons
+        tier: backend
+    spec:
+      containers:
+        - name: charlie-addons-worker
+          image: gcr.io/charliebertvg/charlie-addons-worker:1.0.0
+          command:
+            - "celery"
+          args:
+            [
+              "-A",
+              "app.worker.intake",
+              "worker",
+              "-l",
+              "info",
+              "-c",
+              "1",
+              "-Q",
+              "personal",
+              "--max-tasks-per-child",
+              "1",
+            ]
+          resources:
+            requests:
+              memory: "100Mi"
+              cpu: "100m"
+            limits:
+              memory: "900Mi"
+              cpu: "900m"
+          envFrom:
+            - configMapRef:
+                name: charlie-addons-worker-config
